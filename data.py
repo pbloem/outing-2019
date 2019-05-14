@@ -23,6 +23,10 @@ def load(name):
         # AIFB data (academics, affiliations, publications, etc. About 8k nodes)
         file = DIR + '/data/aifb_stripped.nt.gz'
 
+    if name == 'eswc':
+        # AIFB data (academics, affiliations, publications, etc. About 8k nodes)
+        file = DIR + '/data/eswc-2017-complete.ttl'
+
     # if name == 'am':
     #     # Collection of the Amsterdam Museum. Data is downloaded on first load.
     #     data_url = 'https://www.dropbox.com/s/1mp9aot4d9j01h9/am_stripped.nt.gz?dl=1'

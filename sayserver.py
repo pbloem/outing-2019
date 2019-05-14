@@ -13,7 +13,7 @@ Send a POST request::
 
 import pyttsx3
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
 engine = pyttsx3.init()
 
@@ -31,7 +31,7 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
         self._set_headers()
 
-        query = urlparse(self.path).query
+        query = urlparse(unquote(self.path)).query
         query = dict(qc.split("=") for qc in query.split("&"))
 
         if 'say' in query:

@@ -1,3 +1,2 @@
 rdflib
 pyttsx3
-wget

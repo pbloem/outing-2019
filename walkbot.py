@@ -1,9 +1,26 @@
+# Uses python2
+
 import data
 import rdflib as rdf
 import random, math, requests, time
-import pyttsx3
 
-engine = pyttsx3.init()
+import roslib #; roslib.load_manifest('sr_example')
+import rospy
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64, String
+
+rospy.init_node('turtlebot_controller', anonymous=True)
+
+
+def move(dist, angle):
+
+    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+
+    message = Twist()
+    message.linear.x = dist
+    message.angular.z = angle
+
+    pub.publish(message)
 
 SAYSERVER = '127.0.0.1'
 NAME = 'eswc'
@@ -12,12 +29,7 @@ STARTING_NODE = rdf.URIRef('https://w3id.org/scholarlydata/person/ilaria-tiddi')
 
 def say(inp):
     print(inp)
-
-    if SAYSERVER is None:
-        engine.say(inp)
-        engine.runAndWait()
-    else:
-        requests.get('http://{}/?say="{}"'.format(SAYSERVER, inp))
+    requests.get('http://{}/?say="{}"'.format(SAYSERVER, inp))
 
 class Inv():
     def __init__(self, m):
@@ -81,7 +93,6 @@ while True:
     say('moving over relation {}'.format( s(prop) ))
     time.sleep(1)
 
-
     node = to
 
     # compute new position
@@ -95,6 +106,8 @@ while True:
     angle = math.atan(b/a)
 
     print('new pos ({:.2}, {:.2}), rotate {:.2}, move {:.2}'.format(pos[0], pos[1], angle, dist))
+
+    move(dist, angle)
 
     input('...')
 
