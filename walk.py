@@ -1,6 +1,6 @@
 import data
 import rdflib as rdf
-import random
+import random, math
 import pyttsx3
 
 engine = pyttsx3.init()
@@ -9,6 +9,7 @@ NAME = 'aifb'
 STARTING_NODE = rdf.URIRef('http://www.aifb.uni-karlsruhe.de/Publikationen/viewPublikationOWL/id647instance')
 
 def say(inp):
+    print(inp)
     engine.say(inp)
     engine.runAndWait()
 
@@ -20,13 +21,14 @@ class Inv():
         return 'inverse of {}'.format(str(self.m))
 
 def s(node):
+    pref = 'inverse of ' if type(node) == Inv else ''
 
     if type(node) == rdf.Literal:
         return str(node)
 
     url = str(node)
 
-    return url.split('/')[-1]
+    return pref + url.split('/')[-1]
 
 def retrieve(node, graph):
     """
@@ -56,6 +58,7 @@ def retrieve(node, graph):
 graph = data.load(NAME)
 
 node = STARTING_NODE
+pos = (0.0, 0.0)
 
 while True:
 
@@ -68,7 +71,21 @@ while True:
 
     fr, prop, to = random.choice(cands)
 
-    say('moving over property {}'.format( s(prop) ))
+    say('moving over relation {}'.format( s(prop) ))
+
+    node = to
+
+    # compute new position
+    oldpos = pos
+    pos = (random.uniform(-1.0, 1.0), random.uniform(-1.0, 1.0))
+
+    a = pos[0] - oldpos[0]
+    b = pos[1] - oldpos[1]
+
+    dist = math.sqrt(a*a + b*b)
+    angle = math.atan(b/a)
+
+    print('new pos ({:.2}, {:.2}), rotate {:.2}, move {:.2}'.format(pos[0], pos[1], angle, dist))
 
     input('...')
 
