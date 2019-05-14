@@ -1,17 +1,22 @@
 import data
 import rdflib as rdf
-import random, math
+import random, math, wget
 import pyttsx3
 
 engine = pyttsx3.init()
 
+SAYSERVER = '127.0.0.1'
 NAME = 'aifb'
 STARTING_NODE = rdf.URIRef('http://www.aifb.uni-karlsruhe.de/Publikationen/viewPublikationOWL/id647instance')
 
 def say(inp):
     print(inp)
-    engine.say(inp)
-    engine.runAndWait()
+
+    if SAYSERVER is None:
+        engine.say(inp)
+        engine.runAndWait()
+    else:
+        wget.download('http://{}/?say{}'.format(SAYSERVER, inpt))
 
 class Inv():
     def __init__(self, m):
