@@ -1,23 +1,34 @@
+# Uses python2
+
 import data
 import rdflib as rdf
 import random, math, requests, time
-import pyttsx3
 
-engine = pyttsx3.init()
+import roslib #; roslib.load_manifest('sr_example')
+import rospy
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Float64, String
 
-SAYSERVER = '127.0.0.1'
-NAME = 'eswc'
-# STARTING_NODE = rdf.URIRef('http://www.aifb.uni-karlsruhe.de/Publikationen/viewPublikationOWL/id647instance')
-STARTING_NODE = rdf.URIRef('https://w3id.org/scholarlydata/person/ilaria-tiddi')
+def callback(data : LaserScan):
+
+    if data.range_min < 0.2:
+        move(node, pos)
+        rospy.sleep(1)
+
+def move(dist, angle):
+
+    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+
+    message = Twist()
+    message.linear.x = dist
+    message.angular.z = angle
+
+    pub.publish(message)
 
 def say(inp):
     print(inp)
-
-    if SAYSERVER is None:
-        engine.say(inp)
-        engine.runAndWait()
-    else:
-        requests.get('http://{}/?say="{}"'.format(SAYSERVER, inp))
+    requests.get('http://{}/?say="{}"'.format(SAYSERVER, inp))
 
 class Inv():
     def __init__(self, m):
@@ -61,13 +72,7 @@ def retrieve(node, graph):
 
     return properties, candidates
 
-graph = data.load(NAME)
-
-node = STARTING_NODE
-pos = (0.0, 0.0)
-
-while True:
-
+def make_move(node, pos, graph):
     props, cands = retrieve(node, graph)
 
     sub, pred, obj = random.choice(props)
@@ -93,8 +98,24 @@ while True:
 
     print('new pos ({:.2}, {:.2}), rotate {:.2}, move {:.2}'.format(pos[0], pos[1], angle, dist))
 
-    input('...')
+    move(dist, angle)
 
+    return node, pos
 
+SAYSERVER = '127.0.0.1'
+NAME = 'eswc'
+# STARTING_NODE = rdf.URIRef('http://www.aifb.uni-karlsruhe.de/Publikationen/viewPublikationOWL/id647instance')
+STARTING_NODE = rdf.URIRef('https://w3id.org/scholarlydata/person/ilaria-tiddi')
+
+graph = data.load(NAME)
+
+node = STARTING_NODE
+pos = (0.0, 0.0)
+
+if __name__ == "__main__":
+
+    rospy.init_node('turtlebot_controller', anonymous=True)
+
+    rospy.Subscriber('/scan', LaserScan, callback)
 
 

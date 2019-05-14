@@ -11,7 +11,6 @@ from std_msgs.msg import Float64, String
 
 rospy.init_node('turtlebot_controller', anonymous=True)
 
-
 def move(dist, angle):
 
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -86,12 +85,10 @@ while True:
 
     say('now at node {}'.format(s(node)))
     say('{} has property {} with value {}'.format(s(sub), s(pred), s(obj)))
-    time.sleep(2)
 
     fr, prop, to = random.choice(cands)
 
     say('moving over relation {}'.format( s(prop) ))
-    time.sleep(1)
 
     node = to
 
